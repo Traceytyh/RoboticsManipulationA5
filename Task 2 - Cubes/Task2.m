@@ -201,6 +201,10 @@ function rotate(position, empty_position) % Rotate cube 90 degrees
         pick(position);
         move_to(empty_position);
         place(empty_position, 0);
+        rotate(empty_position, position);
+        pick(empty_position);
+        move_to(position);
+        place(position, 0);
     else
         pick(position);
         % Code to rotate block
@@ -210,7 +214,7 @@ function rotate(position, empty_position) % Rotate cube 90 degrees
         angle_desired = 0;
         [theta1, theta3, theta4, theta5] = compute_ik(x, y, z, angle_desired);
         % Write to DXL
-        
+
         place(position, 1);
     end
 end
