@@ -41,9 +41,9 @@ DXL_ID1                     = 11;
 DXL_ID2                     = 12; 
 DXL_ID3                     = 13;
 DXL_ID4                     = 14;
-DXL_ID5                     = 15;% Dynamixel ID: 1
+DXL_ID5                     = 15;
 BAUDRATE                    = 115200;
-DEVICENAME                  = 'COM11';       % Check which port is being used on your controller
+DEVICENAME                  = 'COM11';      % Check which port is being used on your controller
                                             % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
 TORQUE_DISABLE              = 0;            % Value for disabling the torque
@@ -301,20 +301,24 @@ function [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, ang
     end
 end
 
-function move_to(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) %position is (x,y,stacklvl)
+function move_to(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) %position is (x,y,stacklvl)
     % If position is out of range, enforce horizontal gripper
     % else enforce vertical gripper (pointing down)
-    if(check_radius(position))
-        angle_desired = 90;
-    else
+    if(rotating)
         angle_desired = 0;
+    else
+        if(check_radius(position))
+            angle_desired = 90;
+        else
+            angle_desired = 0;
+        end
     end
     % Assign  position
-    x_to = position(1);
-    y_to = position(2);
-    z_to = 180; % set value high enough to avoid collision
+    x = position(1);
+    y = position(2);
+    z = 140; % set value high enough to avoid collision
     [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
-    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x_to, y_to, z_to, angle_desired);
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     % Perform IK
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj); 
     % Write to DXL1-4
@@ -329,26 +333,26 @@ end
 function pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, open);
     pause(2);
-    x = [position(1), position(1)];
-    y = [position(2), position(2)];
-    z = [180];
+    x = position(1);
+    y = position(2);
+    z = 140;
     if(position(3) == 0)
         disp("Error: cannot pick from empty cube holder");
     elseif(position(3) == 1)
-        z(end + 1) = 40;
+        z = 40;
     elseif(position(3) == 2)
-        z(end + 1) = 62;
+        z = 62;
     elseif(position(3) == 3)
-        z(end + 1) = 85;
+        z = 85;
     end
     if(check_radius(position))
-        angle_desired = [90, 90];
+        angle_desired = 90;
     else
-        angle_desired = [0, 0];
+        angle_desired = 0;
     end
     % Lower
     [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
-    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x(2), y(2), z(2), angle_desired(2));
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
@@ -362,10 +366,9 @@ function pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, D
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, closed);
     pause(2);
     % Raise
-    x = [position(1)];
-    y = [position(2)];
-    z = [180];
-    angle_desired(end) = [];
+    x = position(1);
+    y = position(2);
+    z = 140;
     [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
@@ -380,29 +383,29 @@ function pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, D
 end
 
 function place(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Place cube according to stack level
-    x = [position(1), position(1)];
-    y = [position(2), position(2)];
-    z = [180];
+    x = position(1);
+    y = position(2);
+    z = 140;
     if(position(3) == 0)
-        z(end + 1) = 40;
+        z = 40;
     elseif(position(3) == 1)
-        z(end + 1) = 62;
+        z = 62;
     elseif(position(3) == 2)
-        z(end + 1) = 85;
+        z = 85;
     end
     if(rotating)
-        angle_desired = [0, 0];
+        angle_desired = 0;
     else
         if(check_radius(position))
-            angle_desired = [90, 90];
+            angle_desired = 90;
         else
-            angle_desired = [0, 0];
+            angle_desired = 0;
         end
     end
 
     % Lower
     [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
-    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x(2), y(2), z(2), angle_desired(2));
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
@@ -413,10 +416,9 @@ function place(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2,
     % Open gripper and release cube
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, open);
     % Raise
-    x = [position(1)];
-    y = [position(2)];
-    z = [180];
-    angle_desired(end) = [];
+    x = position(1);
+    y = position(2);
+    z = 140;
     [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
@@ -442,8 +444,8 @@ function rotate(position, empty_position, port_num, PROTOCOL_VERSION, DXL_ID1, D
     else
         pick(position);
         % Code to rotate block
-        x = [position(1)];
-        y = [position(2)];
+        x = position(1);
+        y = position(2);
         z = 140;
         angle_desired = 0;
         [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
