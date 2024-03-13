@@ -1,3 +1,182 @@
+% Read the position of the dynamixel horn with the torque off
+% The code executes for a given amount of time then terminates
+ 
+ 
+clc;
+clear all;
+
+lib_name = '';
+ 
+if strcmp(computer, 'PCWIN')
+  lib_name = 'dxl_x86_c';
+elseif strcmp(computer, 'PCWIN64')
+  lib_name = 'dxl_x64_c';
+elseif strcmp(computer, 'GLNX86')
+  lib_name = 'libdxl_x86_c';
+elseif strcmp(computer, 'GLNXA64')
+  lib_name = 'libdxl_x64_c';
+elseif strcmp(computer, 'MACI64')
+  lib_name = 'libdxl_mac_c';
+end
+ 
+% Load Libraries
+if ~libisloaded(lib_name)
+    [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h');
+end
+ 
+%% ---- Control Table Addresses ---- %%
+ 
+ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model
+ADDR_PRO_GOAL_POSITION       = 116; 
+ADDR_PRO_PRESENT_POSITION    = 132; 
+ADDR_PRO_OPERATING_MODE      = 11;    % 1BYTE
+ADDR_CURRENT_LIMIT           = 38;    % 2BYTE
+ADDR_GOAL_CURRENT            = 102;   % 2BYTE
+ADDR_PRESENT_CURRENT         = 126;   % 2BYTE
+ 
+%% ---- Other Settings ---- %%
+ 
+% Protocol version
+PROTOCOL_VERSION            = 2.0;          % See which protocol version is used in the Dynamixel
+ 
+% Default setting
+DXL_ID1                     = 11; 
+DXL_ID2                     = 12; 
+DXL_ID3                     = 13;
+DXL_ID4                     = 14;
+DXL_ID5                     = 15;% Dynamixel ID: 1
+BAUDRATE                    = 115200;
+DEVICENAME                  = 'COM11';       % Check which port is being used on your controller
+                                            % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
+TORQUE_ENABLE               = 1;            % Value for enabling the torque
+TORQUE_DISABLE              = 0;            % Value for disabling the torque
+DXL_MINIMUM_POSITION_VALUE  = -150000;      % Dynamixel will rotate between this value
+DXL_MAXIMUM_POSITION_VALUE  = 150000;       % and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
+DXL_MOVING_STATUS_THRESHOLD = 20;           % Dynamixel moving status threshold
+ 
+ESC_CHARACTER               = 'e';          % Key for escaping loop
+ 
+COMM_SUCCESS                = 0;            % Communication Success result value
+COMM_TX_FAIL                = -1001;        % Communication Tx Failed
+ 
+%% ------------------ %%
+ 
+% Initialize PortHandler Structs
+% Set the port path
+% Get methods and members of PortHandlerLinux or PortHandlerWindows
+port_num = portHandler(DEVICENAME);
+ 
+% Initialize PacketHandler Structs
+packetHandler();
+ 
+index = 1;
+dxl_comm_result = COMM_TX_FAIL;           % Communication result
+dxl_goal_position = [DXL_MINIMUM_POSITION_VALUE DXL_MAXIMUM_POSITION_VALUE];         % Goal position
+ 
+dxl_error = 0;                              % Dynamixel error
+dxl_present_position = 0;                   % Present position
+ 
+% ----- SET MOTION LIMITS ----------- %
+ADDR_MAX_POS = 48;
+ADDR_MIN_POS = 52;
+%MAX_POS = 3400;
+%MIN_POS = 600;
+DXL_ID1_MIN_POS = 0000;  % Min and max for DXL_ID1
+DXL_ID1_MAX_POS = 4000;
+DXL_ID2_MIN_POS = 0750;  % Min and max for DXL_ID2
+DXL_ID2_MAX_POS = 3310;
+DXL_ID3_MIN_POS = 0690;  % Min and max for DXL_ID3
+DXL_ID3_MAX_POS = 3050;
+DXL_ID4_MIN_POS = 0837;  % Min and max for DXL_ID4
+DXL_ID4_MAX_POS = 3463;
+DXL_ID5_MIN_POS = 3530;  % Min and max for DXL_ID5
+DXL_ID5_MAX_POS = 6714;
+
+% Theta limits
+THETA1_MIN = -180;
+THETA1_MAX =  180;
+THETA3_MIN = -193;
+THETA3_MAX =   32;
+THETA4_MIN =  -39;
+THETA4_MAX =  169;
+THETA5_MIN = -106;
+THETA5_MAX =  125;
+
+% Set max position limit
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_MAX_POS, DXL_ID1_MAX_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_MAX_POS, DXL_ID2_MAX_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_MAX_POS, DXL_ID3_MAX_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_MAX_POS, DXL_ID4_MAX_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_MAX_POS, DXL_ID5_MAX_POS);
+% Set min position limit
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_MIN_POS, DXL_ID1_MIN_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_MIN_POS, DXL_ID2_MIN_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_MIN_POS, DXL_ID3_MIN_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_MIN_POS, DXL_ID4_MIN_POS);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_MIN_POS, DXL_ID5_MIN_POS);
+ 
+% ---------------------------------- %
+
+% Open port
+if (openPort(port_num))
+    fprintf('Port Open\n');
+else
+    unloadlibrary(lib_name);
+    fprintf('Failed to open the port\n');
+    input('Press any key to terminate...\n');
+    return;
+end
+ 
+ 
+% Set port baudrate
+if (setBaudRate(port_num, BAUDRATE))
+    fprintf('Baudrate Set\n');
+else
+    unloadlibrary(lib_name);
+    fprintf('Failed to change the baudrate!\n');
+    input('Press any key to terminate...\n');
+    return;
+end
+ 
+% Put actuator into Position Control Mode
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_OPERATING_MODE, 3);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_OPERATING_MODE, 3);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_OPERATING_MODE, 3);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_OPERATING_MODE, 3);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_OPERATING_MODE, 5);
+write2ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_GOAL_CURRENT, 150);
+ 
+% Enable Dynamixel Torque
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_TORQUE_ENABLE, 1);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_TORQUE_ENABLE, 1);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_TORQUE_ENABLE, 1);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_TORQUE_ENABLE, 1);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_TORQUE_ENABLE, 1);
+dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
+dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
+ 
+if dxl_comm_result ~= COMM_SUCCESS
+    fprintf('%s\n', getTxRxResult(PROTOCOL_VERSION, dxl_comm_result));
+elseif dxl_error ~= 0
+    fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
+else
+    fprintf('Dynamixel has been successfully connected \n');
+end
+ 
+dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
+    dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
+    if dxl_comm_result ~= COMM_SUCCESS
+        fprintf('%s\n', getTxRxResult(PROTOCOL_VERSION, dxl_comm_result)); %print result
+    elseif dxl_error ~= 0
+        fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
+    end
+dxl_present_position1 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_PRESENT_POSITION);
+dxl_present_position2 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_PRESENT_POSITION);
+dxl_present_position3 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_PRESENT_POSITION);
+dxl_present_position4 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
+dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
+
+
 % position = [x, y, cube stack level]
 % Holder positions 1, 2, 3 - grip horizontally
 holder_pos1 = [ 80, -200, 0];   % r = 215
@@ -8,7 +187,24 @@ holder_pos5 = [100,    0, 0];   % r = 100
 holder_pos6 = [  0,  100, 0];   % r = 100
 
 check_radius(holder_pos3)
-move_to(holder_pos3)
+move_to(holder_pos3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+
+% Disable Dynamixel Torque
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_TORQUE_ENABLE, 0);
+
+% Close port
+closePort(port_num);
+fprintf('Port Closed \n');
+ 
+% Unload Library
+unloadlibrary(lib_name);
+ 
+close all;
+clear all;
 
 function [x, y, z, angle] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION)
     position1 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_PRESENT_POSITION);
