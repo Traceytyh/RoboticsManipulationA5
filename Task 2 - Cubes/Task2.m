@@ -151,6 +151,8 @@ function pick(position) % Pick up cube according to stack level
         angle_desired = [0, 0];
     end
     % Lower
+    [x_from, y_from, z_from, angle_from] = currentangles();
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x(2), y(2), z(2), angle_desired(2));
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
         write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
@@ -168,6 +170,8 @@ function pick(position) % Pick up cube according to stack level
     y = [position(2)];
     z = [180];
     angle_desired(end) = [];
+    [x_from, y_from, z_from, angle_from] = currentangles();
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
         write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
@@ -201,6 +205,8 @@ function place(position, rotating) % Place cube according to stack level
     end
 
     % Lower
+    [x_from, y_from, z_from, angle_from] = currentangles();
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x(2), y(2), z(2), angle_desired(2));
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
         write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
@@ -215,6 +221,8 @@ function place(position, rotating) % Place cube according to stack level
     y = [position(2)];
     z = [180];
     angle_desired(end) = [];
+    [x_from, y_from, z_from, angle_from] = currentangles();
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
         write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
@@ -242,6 +250,8 @@ function rotate(position, empty_position) % Rotate cube 90 degrees
         y = [position(2)];
         z = 140;
         angle_desired = 0;
+        [x_from, y_from, z_from, angle_from] = currentangles();
+        [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
         [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
         write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
