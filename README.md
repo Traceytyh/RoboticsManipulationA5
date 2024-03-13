@@ -16,9 +16,10 @@ Given the spatial limitations of the robot arm, the x-y horizontal plane had to 
 - Code written to dynamixel for video
 
 Task 3 Pen
-- 
+-
 The smooth trajectory for the arc is obtained from its projection on the y-axis. Hence, it is split into 4 cases on whether it exceeds the maximum y points of the circle and whether it is drawn on the upper half or bottom half of the circle.
-- Functions (Getting coordinates of points for drawing a smooth trajectory)
+- PreTraj - Finding the right centres and coordinates of circle should they not be given
+- Traj - Functions (Getting coordinates of points for moving in a smooth trajectory)
 - Picking up and returning pen functions
 - Inverse Kinematics for each point
 - Code written to Dynamixel for video
