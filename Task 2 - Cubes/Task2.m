@@ -30,9 +30,6 @@ ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is differen
 ADDR_PRO_GOAL_POSITION       = 116; 
 ADDR_PRO_PRESENT_POSITION    = 132; 
 ADDR_PRO_OPERATING_MODE      = 11;    % 1BYTE
-ADDR_CURRENT_LIMIT           = 38;    % 2BYTE
-ADDR_GOAL_CURRENT            = 102;   % 2BYTE
-ADDR_PRESENT_CURRENT         = 126;   % 2BYTE
  
 %% ---- Other Settings ---- %%
  
@@ -75,6 +72,8 @@ dxl_goal_position = [DXL_MINIMUM_POSITION_VALUE DXL_MAXIMUM_POSITION_VALUE];    
  
 dxl_error = 0;                              % Dynamixel error
 dxl_present_position = 0;                   % Present position
+
+ADDR_GOAL_CURRENT            = 102; 
  
 % ----- SET MOTION LIMITS ----------- %
 ADDR_MAX_POS = 48;
@@ -116,7 +115,6 @@ write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_MIN_POS, DXL_ID4_MIN_PO
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_MIN_POS, DXL_ID5_MIN_POS);
  
 % ---------------------------------- %
-
 % Open port
 if (openPort(port_num))
     fprintf('Port Open\n');
@@ -170,11 +168,10 @@ dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
     elseif dxl_error ~= 0
         fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
     end
-dxl_present_position1 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_PRESENT_POSITION);
-dxl_present_position2 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_PRESENT_POSITION);
-dxl_present_position3 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_PRESENT_POSITION);
-dxl_present_position4 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
+    
 dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
+closed = 225;
+open = 130;
 
 
 % position = [x, y, cube stack level]
