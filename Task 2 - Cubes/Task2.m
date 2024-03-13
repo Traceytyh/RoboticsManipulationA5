@@ -10,7 +10,7 @@ holder_pos6 = [  0,  100, 0];   % r = 100
 check_radius(holder_pos3)
 move_to(holder_pos3)
 
-function [x, y, z, angle] = currentangles()
+function [x, y, z, angle] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION)
     position1 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_PRESENT_POSITION);
     position3 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_PRESENT_POSITION);
     position4 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_PRESENT_POSITION);
@@ -90,6 +90,7 @@ function rad = check_radius(position) % return 1 if radius > 207, 0 if otherwise
         rad = 0;
     end
 end
+
 function [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x_to, y_to, z_to, angle_to)
     resolution = 10;
     xTraj = zeros(1, resolution);
@@ -107,7 +108,7 @@ function [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, ang
     end
 end
 
-function move_to(position) %position is (x,y,stacklvl)
+function move_to(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) %position is (x,y,stacklvl)
     % If position is out of range, enforce horizontal gripper
     % else enforce vertical gripper (pointing down)
     if(check_radius(position))
@@ -119,20 +120,20 @@ function move_to(position) %position is (x,y,stacklvl)
     x_to = position(1);
     y_to = position(2);
     z_to = 180; % set value high enough to avoid collision
-    [x_from, y_from, z_from, angle_from] = currentangles();
+    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x_to, y_to, z_to, angle_desired);
     % Perform IK
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj); 
     % Write to DXL1-4
     for i = 1:size(position1)
-      write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);
-      write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID2, app.ADDR_PRO_GOAL_POSITION, position2);
-      write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID3, app.ADDR_PRO_GOAL_POSITION, position3);
-      write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID4, app.ADDR_PRO_GOAL_POSITION, position4);
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2);
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3);
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4);
     end
 end
 
-function pick(position) % Pick up cube according to stack level
+function pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
     x = [position(1), position(1)];
     y = [position(2), position(2)];
     z = [180];
@@ -151,14 +152,14 @@ function pick(position) % Pick up cube according to stack level
         angle_desired = [0, 0];
     end
     % Lower
-    [x_from, y_from, z_from, angle_from] = currentangles();
+    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x(2), y(2), z(2), angle_desired(2));
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID2, app.ADDR_PRO_GOAL_POSITION, position2);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID3, app.ADDR_PRO_GOAL_POSITION, position3);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID4, app.ADDR_PRO_GOAL_POSITION, position4);     
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4);     
     end
  
     % Close gripper
@@ -170,20 +171,20 @@ function pick(position) % Pick up cube according to stack level
     y = [position(2)];
     z = [180];
     angle_desired(end) = [];
-    [x_from, y_from, z_from, angle_from] = currentangles();
+    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID2, app.ADDR_PRO_GOAL_POSITION, position2);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID3, app.ADDR_PRO_GOAL_POSITION, position3);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID4, app.ADDR_PRO_GOAL_POSITION, position4);     
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4);   
     end
  
     position(3) = position(3) - 1;
 end
 
-function place(position, rotating) % Place cube according to stack level
+function place(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Place cube according to stack level
     x = [position(1), position(1)];
     y = [position(2), position(2)];
     z = [180];
@@ -205,14 +206,14 @@ function place(position, rotating) % Place cube according to stack level
     end
 
     % Lower
-    [x_from, y_from, z_from, angle_from] = currentangles();
+    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x(2), y(2), z(2), angle_desired(2));
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID2, app.ADDR_PRO_GOAL_POSITION, position2);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID3, app.ADDR_PRO_GOAL_POSITION, position3);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID4, app.ADDR_PRO_GOAL_POSITION, position4);     
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4);     
     end
     % Open gripper and release cube
  
@@ -221,28 +222,28 @@ function place(position, rotating) % Place cube according to stack level
     y = [position(2)];
     z = [180];
     angle_desired(end) = [];
-    [x_from, y_from, z_from, angle_from] = currentangles();
+    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID2, app.ADDR_PRO_GOAL_POSITION, position2);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID3, app.ADDR_PRO_GOAL_POSITION, position3);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID4, app.ADDR_PRO_GOAL_POSITION, position4);     
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4);
     end
  
     position(3) = position(3) + 1;
 end
 
-function rotate(position, empty_position) % Rotate cube 90 degrees
+function rotate(position, empty_position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Rotate cube 90 degrees
     if(check_radius(position)) % If outside range, move closer before rotating
-        pick(position);
-        move_to(empty_position);
-        place(empty_position, 0);
-        rotate(empty_position, position);
-        pick(empty_position);
-        move_to(position);
-        place(position, 0);
+        pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+        move_to(empty_position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+        place(empty_position, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+        rotate(empty_position, position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+        pick(empty_position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+        move_to(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+        place(position, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
     else
         pick(position);
         % Code to rotate block
@@ -250,15 +251,15 @@ function rotate(position, empty_position) % Rotate cube 90 degrees
         y = [position(2)];
         z = 140;
         angle_desired = 0;
-        [x_from, y_from, z_from, angle_from] = currentangles();
+        [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
         [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
         [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
     for i = 1:size(position1)       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID1, app.ADDR_PRO_GOAL_POSITION, position1);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID2, app.ADDR_PRO_GOAL_POSITION, position2);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID3, app.ADDR_PRO_GOAL_POSITION, position3);       
-        write4ByteTxRx(app.port_num, app.PROTOCOL_VERSION, app.DXL_ID4, app.ADDR_PRO_GOAL_POSITION, position4);     
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3);
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4);
     end
-        place(position, 1);
+        place(position, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
     end
 end
