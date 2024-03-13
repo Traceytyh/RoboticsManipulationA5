@@ -90,21 +90,7 @@ function rad = check_radius(position) % return 1 if radius > 207, 0 if otherwise
         rad = 0;
     end
 end
-
-function move_to(position) %position is (x,y,stacklvl)
-    % If position is out of range, enforce horizontal gripper
-    % else enforce vertical gripper (pointing down)
-    if(check_radius(position))
-        angle_desired = 90;
-    else
-        angle_desired = 0;
-    end
-    % Assign  position
-    x_to = position(1);
-    y_to = position(2);
-    z_to = 180; % set value high enough to avoid collision
-    [x_from, y_from, z_from, angle_from] = currentangles();
-    [xTraj, yTraj, zTraj, angleTraj] = formTraj(coor_from, coor_to);
+function [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x_to, y_to, z_to, angle_to)
     resolution = 10;
     xTraj = zeros(1, resolution);
     yTraj = zeros(1, resolution);
@@ -119,7 +105,22 @@ function move_to(position) %position is (x,y,stacklvl)
             angleTraj(i) = angle_to + 3/resolution^2*(angle_to-angle_from)*j^2 - 2/resolution^3*(angle_to-angle_from)*j^3;
         j = j + 1;
     end
- 
+end
+
+function move_to(position) %position is (x,y,stacklvl)
+    % If position is out of range, enforce horizontal gripper
+    % else enforce vertical gripper (pointing down)
+    if(check_radius(position))
+        angle_desired = 90;
+    else
+        angle_desired = 0;
+    end
+    % Assign  position
+    x_to = position(1);
+    y_to = position(2);
+    z_to = 180; % set value high enough to avoid collision
+    [x_from, y_from, z_from, angle_from] = currentangles();
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x_to, y_to, z_to, angle_desired);
     % Perform IK
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj); 
     % Write to DXL1-4
