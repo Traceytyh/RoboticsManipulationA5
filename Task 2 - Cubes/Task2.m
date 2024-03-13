@@ -327,6 +327,8 @@ function move_to(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3
 end
 
 function pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, open);
+    pause(2);
     x = [position(1), position(1)];
     y = [position(2), position(2)];
     z = [180];
@@ -357,7 +359,7 @@ function pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, D
  
     % Close gripper
     pause(2);
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, 2400);
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, closed);
     pause(2);
     % Raise
     x = [position(1)];
@@ -409,7 +411,7 @@ function place(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2,
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4);     
     end
     % Open gripper and release cube
- 
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, open);
     % Raise
     x = [position(1)];
     y = [position(2)];
