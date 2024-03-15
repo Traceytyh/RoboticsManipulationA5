@@ -180,7 +180,7 @@ holder_pos1 = [ 77, -198, 1];   % r = 215
 holder_pos2 = [226,    0, 1];   % r = 226
 holder_pos3 = [146,  152, 1];   % r = 210
 %holder_pos4 = [132, -131, 0];   % r = 185
-holder_pos4 = [127, -126, 1];
+holder_pos4 = [127, -126, 0];
 %holder_pos4hor = [122, -121, 0];
 holder_pos5 = [110,   -5, 0];   % r = 100
 holder_pos6 = [  0,  115, 0];   % r = 100
