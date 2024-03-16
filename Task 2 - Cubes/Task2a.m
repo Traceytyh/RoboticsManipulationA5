@@ -302,6 +302,11 @@ function [position1, position2, position3, position4] = IK(x_desired, y_desired,
             end
         else
             disp("out of bound");
+            if i ~=1
+               theta3(i) = theta3(i - 1);
+               theta4(i) = theta4(i - 1);
+               theta5(i) = theta5(i - 1);
+            end
         end
     end
     thetafix = asin(0.024/0.13)/pi*180;
