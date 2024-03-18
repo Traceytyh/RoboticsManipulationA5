@@ -27,10 +27,10 @@ end
  
 %% ---- Control Table Addresses ---- %%
  
-ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model
-ADDR_PRO_GOAL_POSITION       = 116; 
-ADDR_PRO_PRESENT_POSITION    = 132; 
-ADDR_PRO_OPERATING_MODE      = 11;    % 1BYTE
+ADDR_PRO_TORQUE_ENABLE        = 64;           % Control table address is different in Dynamixel model
+ADDR_PRO_GOAL_POSITION        = 116; 
+ADDR_PRO_PRESENT_POSITION     = 132; 
+ADDR_PRO_OPERATING_MODE       = 11;
 ADDR_PRO_PROFILE_ACCELERATION = 108;
 ADDR_PRO_PROFILE_VELOCITY     = 112;
  
@@ -166,7 +166,7 @@ write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_OPERATING_MODE, 3);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_OPERATING_MODE, 5);
 write2ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_GOAL_CURRENT, 150);
 
-% Smooth Test
+% Smooth motion
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_PROFILE_ACCELERATION, 100);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_PROFILE_ACCELERATION, 100);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_PROFILE_ACCELERATION, 100);
@@ -194,25 +194,12 @@ open = 1200;
 % Holder positions 1, 2, 3 - grip horizontally
 holder_pos1 = [ 72, -195, 1];   % r = 215
 holder_pos2 = [218,    2, 1];   % r = 226
-%holder_pos3 = [144,  146, 1];   % r = 210
 holder_pos3 = [143,  147, 1];
-%holder_pos4 = [132, -131, 0];   % r = 185
 holder_pos4 = [130, -130, 0];
-%holder_pos4hor = [122, -121, 0];
 holder_pos5 = [110,   -5, 0];   % r = 100
 holder_pos6 = [  0,  115, 0];   % r = 100
 rotate_pos4 = [100, -100, 0];
 
-%check_radius(holder_pos3)
-
-% Old (rotate cube at position 4)
-% move_to(holder_pos4, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-% holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-% move_to(rotate_pos4, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-% move_to(holder_pos4, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-% holder_pos4(3) = place(holder_pos4, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-
-% New rotation using rotate()
 % Should pick cube at position 1, move to 4 for rotation, then return to 1
 % and place
 move_to(holder_pos1, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
@@ -376,7 +363,6 @@ function move_to(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID
     % disp(z_from);
     % disp(angle_from);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
-    %assignin('base', 'xTraj', xTraj);
     % Perform IK
     [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj); 
     % Write to DXL1-4
@@ -467,73 +453,6 @@ function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_I
     stack_level = position(3) - 1;
 end
 
-
-
-function stack_level = pick2(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Place cube according to stack level
-    x = position(1);
-    y = position(2);
-    %z = 140;
-    if(position(3) == 0)
-        %z = 40;
-        z = 48;
-    elseif(position(3) == 1)
-        %z = 62;
-        z = 70;
-    elseif(position(3) == 2)
-        %z = 85;
-        z = 92;
-    end
-    if(rotating)
-        x = position(1) - 15;
-        y = position(2) + 15;
-        angle_desired = 0;
-    else
-        if(check_radius(position))
-            angle_desired = 0;
-        else
-            angle_desired = 90;
-        end
-    end
-    disp(angle_desired);
-
-    % Lower
-    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
-    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
-    [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
-    for i = 1:length(position1)
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1(i));
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2(i));
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3(i));
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4(i));
-    end
-    pause(1)
-    % Close gripper
-    dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    closed = 2500;
-    open = 1800;
-    %closed = 3760;
-    %open = 4260;
-    opening = linspace(dxl_present_position5, closed, 10);
-    for i = 1:length(opening)
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
-    end
-    % Raise
-    x = position(1);
-    y = position(2);
-    z = 130;
-    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
-    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
-    [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
-    for i = 1:length(position1)
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1(i));
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2(i));
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3(i));
-      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4(i));
-    end
- 
-    stack_level = position(3) + 1;
-end
-
 function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Place cube according to stack level
     x = position(1);
     y = position(2);
@@ -559,8 +478,6 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
             angle_desired = 90;
         end
     end
-    disp(angle_desired);
-
     % Lower
     [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
     [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
@@ -654,23 +571,4 @@ function rotate(position, empty_position, no_of_rotations, port_num, PROTOCOL_VE
     move_to(position, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
     disp(position(3));
     position(3) = place(position, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-end
-
-function flip(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Rotate cube 90 degrees
-        pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-        % Code to rotate block
-        x = position(1);
-        y = position(2);
-        z = 140;
-        angle_desired = 0;
-        [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
-        [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
-        [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
-        for i = 1:length(position1)
-          write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1(i));
-          write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2(i));
-          write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3(i));
-          write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4(i));
-        end
-        place(position, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 end
