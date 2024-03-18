@@ -43,7 +43,7 @@ DXL_ID3                     = 13;
 DXL_ID4                     = 14;
 DXL_ID5                     = 15;
 BAUDRATE                    = 115200;
-DEVICENAME                  = 'COM12';      % Check which port is being used on your controller
+DEVICENAME                  = 'COM9';      % Check which port is being used on your controller
                                             % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
 TORQUE_DISABLE              = 0;            % Value for disabling the torque
@@ -176,9 +176,9 @@ open = 1200;
 
 % position = [x, y, cube stack level]
 % Holder positions 1, 2, 3 - grip horizontally
-holder_pos1 = [ 77, -198, 1];   % r = 215
-holder_pos2 = [226,    0, 1];   % r = 226
-holder_pos3 = [146,  152, 1];   % r = 210
+holder_pos1 = [ 70, -195, 1];   % r = 215
+holder_pos2 = [217,    0, 1];   % r = 226
+holder_pos3 = [143,  144, 1];   % r = 210
 %holder_pos4 = [132, -131, 0];   % r = 185
 holder_pos4 = [127, -126, 0];
 %holder_pos4hor = [122, -121, 0];
@@ -197,26 +197,26 @@ rotate_pos4 = [115, -114, 0];
 
 % New rotation using rotate()
 % Should pick cube at position 1, move to 4 for rotation, then place at 6
-% and place
-rotate(holder_pos1, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-holder_pos4(3) = holder_pos4(3) + 1;
-holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%move_to(holder_pos1, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%rotate(holder_pos1, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%holder_pos4(3) = holder_pos4(3) + 1;
+%holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 % Should pick cube at position 2, move to 4 for rotation, then stack onto 6
-% and place
+move_to(holder_pos2, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 rotate(holder_pos2, holder_pos4, 3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 holder_pos4(3) = holder_pos4(3) + 1;
 holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 % Should pick cube at position 3, move to 4 for rotation, then stack onto 6
-% and place
-rotate(holder_pos3, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-holder_pos4(3) = holder_pos4(3) + 1;
-holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%move_to(holder_pos3, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%rotate(holder_pos3, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%holder_pos4(3) = holder_pos4(3) + 1;
+%holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 
 % Disable Dynamixel Torque
 % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_TORQUE_ENABLE, 0);
@@ -299,6 +299,11 @@ function [position1, position2, position3, position4] = IK(x_desired, y_desired,
             end
         else
             disp("out of bound");
+            if i ~=1
+               theta3(i) = theta3(i - 1);
+               theta4(i) = theta4(i - 1);
+               theta5(i) = theta5(i - 1);
+            end
         end
     end
     thetafix = asin(0.024/0.13)/pi*180;
@@ -377,8 +382,10 @@ end
 
 function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    closed = 2500;
-    open = 1200;
+    %closed = 2500;
+    %open = 1800;
+    closed = 3760;
+    open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
     for i = 1:length(opening)
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
@@ -391,16 +398,28 @@ function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_I
         disp("Error: cannot pick from empty cube holder");
     elseif(position(3) == 1)
         %z = 40;
-        z = 63;
+        z = 52;
     elseif(position(3) == 2)
         %z = 62;
-        z = 85;
+        z = 74;
     elseif(position(3) == 3)
         %z = 85;
-        z = 100;
+        z = 97;
     end
     if(check_radius(position))
         angle_desired = 0;
+        if(position(3) == 0)
+            disp("Error: cannot pick from empty cube holder");
+        elseif(position(3) == 1)
+            %z = 40;
+            z = 44;
+        elseif(position(3) == 2)
+            %z = 62;
+            z = 62;
+        elseif(position(3) == 3)
+            %z = 85;
+            z = 100;
+        end
     else
         angle_desired = 90;
     end
@@ -446,13 +465,13 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
     %z = 140;
     if(position(3) == 0)
         %z = 40;
-        z = 55;
+        z = 48;
     elseif(position(3) == 1)
         %z = 62;
-        z = 85;
+        z = 70;
     elseif(position(3) == 2)
         %z = 85;
-        z = 100;
+        z = 92;
     end
     if(rotating)
         x = position(1) - 5;
@@ -480,8 +499,10 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
     pause(1)
     % Open gripper and release cube
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    closed = 2500;
-    open = 1200;
+    %closed = 2500;
+    %open = 1800;
+    closed = 3760;
+    open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
     for i = 1:length(opening)
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
