@@ -183,7 +183,7 @@ holder_pos3 = [143,  144, 1];   % r = 210
 holder_pos4 = [127, -126, 0];
 %holder_pos4hor = [122, -121, 0];
 holder_pos5 = [110,   -5, 0];   % r = 100
-holder_pos6 = [  0,  115, 0];   % r = 100
+holder_pos6 = [  0,   95, 0];   % r = 100
 rotate_pos4 = [115, -114, 0];
 
 %check_radius(holder_pos3)
@@ -198,25 +198,25 @@ rotate_pos4 = [115, -114, 0];
 % New rotation using rotate()
 % Should pick cube at position 1, move to 4 for rotation, then place at 6
 %move_to(holder_pos1, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-%rotate(holder_pos1, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%rotate(holder_pos1, holder_pos4, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 %holder_pos4(3) = holder_pos4(3) + 1;
 %holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 %move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 %holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 % Should pick cube at position 2, move to 4 for rotation, then stack onto 6
-move_to(holder_pos2, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-rotate(holder_pos2, holder_pos4, 3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-holder_pos4(3) = holder_pos4(3) + 1;
-holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-% Should pick cube at position 3, move to 4 for rotation, then stack onto 6
-%move_to(holder_pos3, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-%rotate(holder_pos3, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%move_to(holder_pos2, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+%rotate(holder_pos2, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 %holder_pos4(3) = holder_pos4(3) + 1;
 %holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 %move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 %holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+% Should pick cube at position 3, move to 4 for rotation, then stack onto 6
+move_to(holder_pos3, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+rotate(holder_pos3, holder_pos4, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+holder_pos4(3) = holder_pos4(3) + 1;
+holder_pos4(3) = pick(holder_pos4, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+holder_pos6(3) = place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 
 % Disable Dynamixel Torque
 % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_TORQUE_ENABLE, 0);
@@ -382,10 +382,10 @@ end
 
 function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    %closed = 2500;
-    %open = 1800;
-    closed = 3760;
-    open = 4260;
+    closed = 2500;
+    open = 1800;
+    %closed = 3760;
+    %open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
     for i = 1:length(opening)
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
@@ -468,10 +468,10 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
         z = 48;
     elseif(position(3) == 1)
         %z = 62;
-        z = 70;
+        z = 55;
     elseif(position(3) == 2)
         %z = 85;
-        z = 92;
+        z = 80;
     end
     if(rotating)
         x = position(1) - 5;
@@ -499,10 +499,10 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
     pause(1)
     % Open gripper and release cube
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    %closed = 2500;
-    %open = 1800;
-    closed = 3760;
-    open = 4260;
+    closed = 2500;
+    open = 1800;
+    %closed = 3760;
+    %open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
     for i = 1:length(opening)
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
