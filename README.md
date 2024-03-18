@@ -23,10 +23,8 @@ The smooth trajectory for the arc is obtained from its projection on the y-axis.
 - Picking up and returning pen functions
 - Inverse Kinematics for each point
 - Code written to Dynamixel for video
-- STL and SLDPRT files of the pen cap and pen casing
 
 Task 4 Apple picking
 - 
-The gripper design draws inspiration from both the Festo fin design and multi-finger grippers. This design allows the robot arm to effectively grasp irregularly shaped objects without exerting excessive pressure. This is particularly useful in tasks such as apple picking, where apples may have slight variations in size and necessitate gentle handling. This is an extension of Task 2 with the trajectory taken being arbitrary. It can be further extended into a claw machine with a joystick interface or incorporating ML and computer vision to determine the desired x,y,z and angles. 
-- STL and SLDPRT files of gripper
-- Functions (Pluck apple and placing it into a crate)
+The gripper design draws inspiration from both the Festo fin design and multi-finger grippers. This design allows the robot arm to effectively grasp irregularly shaped objects without exerting excessive pressure. This is particularly useful in tasks such as a claw machine, where objects may have slight variations in size and necessitate gentle handling. This is an extension of Task 2 with the trajectory taken being arbitrary. It can be further extended into a claw machine with a joystick interface or incorporating ML and computer vision to determine the desired x,y,z and angles. 
+- MATLAB App
