@@ -200,15 +200,15 @@ rotate_pos4 = [100, -100, 0];
 % Should pick cube at position 1, move to 4 for rotation, then return to 1
 % and place
 move_to(holder_pos1, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-rotate(holder_pos1, holder_pos4, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+rotate(holder_pos1, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 % Should pick cube at position 2, move to 4 for rotation, then return to 2
 % and place
 move_to(holder_pos2, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-rotate(holder_pos2, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+rotate(holder_pos2, holder_pos4, 3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 % Should pick cube at position 3, move to 4 for rotation, then return to 3
 % and place
 move_to(holder_pos3, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-rotate(holder_pos3, holder_pos4, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+rotate(holder_pos3, holder_pos4, 2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 
 % Disable Dynamixel Torque
 % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_TORQUE_ENABLE, 0);
@@ -451,6 +451,85 @@ function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_I
     stack_level = position(3) - 1;
 end
 
+function stack_level = pick2(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
+    dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
+    closed = 2500;
+    open = 1800;
+    %closed = 3760;
+    %open = 4260;
+    opening = linspace(dxl_present_position5, open, 10);
+    for i = 1:length(opening)
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
+    end
+    pause(2);
+    x = position(1);
+    y = position(2);
+    % I am commenting this line out z = 140;
+    if(position(3) == 0)
+        disp("Error: cannot pick from empty cube holder");
+    elseif(position(3) == 1)
+        %z = 40;
+        z = 52;
+    elseif(position(3) == 2)
+        %z = 62;
+        z = 74;
+    elseif(position(3) == 3)
+        %z = 85;
+        z = 97;
+    end
+    if(check_radius(position))
+        angle_desired = 0;
+        if(position(3) == 0)
+            disp("Error: cannot pick from empty cube holder");
+        elseif(position(3) == 1)
+            %z = 40;
+            z = 40;
+        elseif(position(3) == 2)
+            %z = 62;
+            z = 62;
+        elseif(position(3) == 3)
+            %z = 85;
+            z = 100;
+        end
+    else
+        angle_desired = 0;
+    end
+    % Lower
+    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
+    [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
+    for i = 1:length(position1)
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1(i));
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2(i));
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3(i));
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4(i));
+    end
+ 
+    % Close gripper
+    pause(1);
+    dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
+    closing = linspace(dxl_present_position5, closed, 10);
+    for i = 1:length(closing)
+        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, closing(i));
+    end
+    pause(1);
+    % Raise
+    x = position(1);
+    y = position(2);
+    z = 120;
+    [x_from, y_from, z_from, angle_from] = currentangles(port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION);
+    [xTraj, yTraj, zTraj, angleTraj] = formTraj(x_from, y_from, z_from, angle_from, x, y, z, angle_desired);
+    [position1, position2, position3, position4] = IK(xTraj, yTraj, zTraj, angleTraj);      % Write to DXL1-4     
+    for i = 1:length(position1)
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_GOAL_POSITION, position1(i));
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID2, ADDR_PRO_GOAL_POSITION, position2(i));
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID3, ADDR_PRO_GOAL_POSITION, position3(i));
+      write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_GOAL_POSITION, position4(i));
+    end
+ 
+    stack_level = position(3) - 1;
+end
+
 function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Place cube according to stack level
     x = position(1);
     y = position(2);
@@ -566,7 +645,7 @@ function rotate(position, empty_position, no_of_rotations, port_num, PROTOCOL_VE
         empty_position(3) = place(empty_position, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
     end
     % Return to original position
-    empty_position(3) = pick(empty_position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+    empty_position(3) = pick2(empty_position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
     move_to(rotate_pos4, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
     move_to(position, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
     disp(position(3));
