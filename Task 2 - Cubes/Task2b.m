@@ -374,10 +374,10 @@ end
 
 function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    %closed = 2500;
-    %open = 1800;
-    closed = 3760;
-    open = 4260;
+    closed = 2500;
+    open = 1800;
+    %closed = 3760;
+    %open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
     for i = 1:length(opening)
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
@@ -491,10 +491,10 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
     pause(1)
     % Open gripper and release cube
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    %closed = 2500;
-    %open = 1800;
-    closed = 3760;
-    open = 4260;
+    closed = 2500;
+    open = 1800;
+    %closed = 3760;
+    %open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
     for i = 1:length(opening)
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
