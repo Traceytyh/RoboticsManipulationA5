@@ -483,7 +483,7 @@ function stack_level = pick2(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_
             disp("Error: cannot pick from empty cube holder");
         elseif(position(3) == 1)
             %z = 40;
-            z = 40;
+            z = 45;
         elseif(position(3) == 2)
             %z = 62;
             z = 62;
