@@ -474,8 +474,8 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
         z = 80;
     end
     if(rotating)
-        x = position(1) - 5;
-        y = position(2) + 5;
+        x = position(1) - 15;
+        y = position(2) + 15;
         angle_desired = 0;
     else
         if(check_radius(position))
