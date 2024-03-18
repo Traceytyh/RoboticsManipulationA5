@@ -185,7 +185,7 @@ holder_pos4 = [130, -130, 0];
 %holder_pos4hor = [122, -121, 0];
 holder_pos5 = [110,   -5, 0];   % r = 100
 holder_pos6 = [  0,  115, 0];   % r = 100
-rotate_pos4 = [105, -105, 0];
+rotate_pos4 = [100, -100, 0];
 
 %check_radius(holder_pos3)
 
