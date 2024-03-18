@@ -181,11 +181,11 @@ holder_pos1 = [ 70, -195, 1];   % r = 215
 holder_pos2 = [217,    0, 1];   % r = 226
 holder_pos3 = [143,  144, 1];   % r = 210
 %holder_pos4 = [132, -131, 0];   % r = 185
-holder_pos4 = [127, -126, 0];
+holder_pos4 = [130, -130, 0];
 %holder_pos4hor = [122, -121, 0];
 holder_pos5 = [110,   -5, 0];   % r = 100
 holder_pos6 = [  0,  115, 0];   % r = 100
-rotate_pos4 = [115, -114, 0];
+rotate_pos4 = [105, -105, 0];
 
 %check_radius(holder_pos3)
 
@@ -404,7 +404,7 @@ function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_I
             disp("Error: cannot pick from empty cube holder");
         elseif(position(3) == 1)
             %z = 40;
-            z = 44;
+            z = 40;
         elseif(position(3) == 2)
             %z = 62;
             z = 62;
