@@ -46,7 +46,7 @@ DXL_ID3                     = 13;
 DXL_ID4                     = 14;
 DXL_ID5                     = 15;
 BAUDRATE                    = 115200;
-DEVICENAME                  = 'COM9';      % Check which port is being used on your controller
+DEVICENAME                  = 'COM10';      % Check which port is being used on your controller
                                             % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
 TORQUE_DISABLE              = 0;            % Value for disabling the torque
@@ -187,33 +187,22 @@ write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID4, ADDR_PRO_TORQUE_ENABLE, 1);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_TORQUE_ENABLE, 1);
     
 dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-closed = 2500;
-open = 1200;
+closed = 1810;
+open = 2150;
 
 % position = [x, y, cube stack level]
 % Holder positions 1, 2, 3 - grip horizontally
-holder_pos1 = [169, -169, 1];   % r = 239
-holder_pos2 = [167,   51, 1];   % r = 175
-holder_pos3 = [ -1,  173, 1];   % r = 173
-holder_pos4 = [132, -132, 0];
-holder_pos5 = [ 97,  -97, 0];
-holder_pos6 = [218,    2, 0];   % r = 100
+holder_pos1 = [169, -172, 1];   % r = 239
+holder_pos2 = [173,   51, 1];   % r = 175
+holder_pos3 = [ -1,  175, 1];   % r = 173
+holder_pos4 = [ -4, -148, 0];
+holder_pos5 = [ 100,-104, 0];
+holder_pos6 = [220,   -3, 0];   % r = 100
+
 rotate_pos4 = [100, -100, 0];
 intermediate_pos = [140, 0, 0];
 
 % Task 2a
-% Move cube from 3 -> 6
-move_to(holder_pos3, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-pick(holder_pos3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-move_to(intermediate_pos, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-move_to(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-place(holder_pos6, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-
-% Move cube from 1 -> 5
-move_to(holder_pos1, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-pick(holder_pos1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-move_to(holder_pos5, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
-place(holder_pos5, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 
 % Move cube from 2 -> 4
 move_to(holder_pos2, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
@@ -221,6 +210,20 @@ pick(holder_pos2, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4
 move_to(intermediate_pos, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 move_to(holder_pos4, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 place(holder_pos4, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+
+% Move cube from 3 -> 6
+move_to(holder_pos3, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+pick(holder_pos3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+move_to(intermediate_pos, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+move_to(holder_pos6, 3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+place(holder_pos6, 3, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+
+% Move cube from 1 -> 5
+move_to(intermediate_pos, 1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+move_to(holder_pos1, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+pick(holder_pos1, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+move_to(holder_pos5, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
+place(holder_pos5, 0, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION);
 
 % Disable Dynamixel Torque
 % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID1, ADDR_PRO_TORQUE_ENABLE, 0);
@@ -349,7 +352,10 @@ end
 function move_to(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) %position is (x,y,stacklvl)
     % If position is out of range, enforce horizontal gripper
     % else enforce vertical gripper (pointing down)
-    if(rotating)
+    if(rotating == 3)
+        angle_desired = 90;
+        z = 100;
+    elseif(rotating)
         angle_desired = 0;
         z = 100;
     else
@@ -358,7 +364,7 @@ function move_to(position, rotating, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID
         else
             angle_desired = 90;
         end
-        z = 130;
+        z = 100;
         disp(angle_desired);
     end
     % Assign  position
@@ -386,8 +392,8 @@ end
 
 function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_ID2, DXL_ID3, DXL_ID4, DXL_ID5, ADDR_PRO_PRESENT_POSITION, ADDR_PRO_GOAL_POSITION) % Pick up cube according to stack level
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    closed = 2500;
-    open = 1800;
+    closed = 1810;
+    open = 2150;
     %closed = 3760;
     %open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
@@ -477,7 +483,9 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
         %z = 85;
         z = 92;
     end
-    if(rotating)
+    if(rotating == 3)
+        angle_desired = 90;
+    elseif(rotating)
         x = position(1) - 15;
         y = position(2) + 15;
         angle_desired = 0;
@@ -502,8 +510,8 @@ function stack_level = place(position, rotating, port_num, PROTOCOL_VERSION, DXL
     pause(1)
     % Open gripper and release cube
     dxl_present_position5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_PRESENT_POSITION);
-    closed = 2500;
-    open = 1800;
+    closed = 1810;
+    open = 2150;
     %closed = 3760;
     %open = 4260;
     opening = linspace(dxl_present_position5, open, 10);
