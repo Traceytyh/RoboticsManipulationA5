@@ -370,7 +370,7 @@ function stack_level = pick(position, port_num, PROTOCOL_VERSION, DXL_ID1, DXL_I
     for i = 1:length(opening)
         write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID5, ADDR_PRO_GOAL_POSITION, opening(i));
     end
-    pause(2);
+    pause(1);
     x = position(1);
     y = position(2);
     if(position(3) == 0)
